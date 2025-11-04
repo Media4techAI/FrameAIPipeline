@@ -1,0 +1,543 @@
+# Frame Pipeline - Configurazione Dettagliata
+
+## Introduzione
+
+Questo documento fornisce una guida completa alla configurazione del Frame Pipeline, dalla configurazione base agli scenari avanzati e personalizzazioni.
+
+## Sistema di Configurazione
+
+### Gerarchia delle Configurazioni
+
+Il sistema utilizza una struttura gerarchica a cascata per le configurazioni:
+
+```
+1. Default Hardcoded Values (lowest priority)
+2. Template Configuration (config_template.json)
+3. User Configuration File (custom.json)
+4. Job-Specific Configuration (job/input/params.json)
+5. Environment Variables (.env)
+6. Runtime Arguments (highest priority)
+```
+
+### File di Configurazione Principale
+
+#### Struttura Base `params.json`
+
+```json
+{
+  "job_id": "job_20231103_150644",
+  "input_dir": "input",
+  "masks_dir": "input/masks",
+  "original_image": "input/original.jpg",
+  "parts": "1:9",
+  
+  "output_steps_dirs": {
+    "step1": "output/step1_generate_new_example",
+    "step2": "output/step2_export_alignments", 
+    "step3": "output/step3_fix_groundtruth",
+    "step4": "output/step4_fix_images",
+    "step5": "output/step5_boost",
+    "step6": "output/step6_reconstruct"
+  },
+  
+  "bg_color": "255 255 255",
+  "bg_tolerance": 0,
+  "mask_extension": ".jpg",
+  "output_extension": ".jpg",
+  "top_k": 10,
+  
+  "load_options": { ... },
+  "dis_options": { ... },
+  "confoptions": { ... },
+  "hyperparameters": { ... }
+}
+```
+
+## Sezioni di Configurazione Dettagliate
+
+### 1. Parametri di Base
+
+#### Job Identification
+```json
+{
+  "job_id": "string",           // ID univoco del job
+  "input_dir": "string",        // Directory input relativa
+  "masks_dir": "string",        // Directory frammenti
+  "original_image": "string",   // Path immagine originale
+  "parts": "string"             // Range parti (es: "1:9", "1:20")
+}
+```
+
+**Validazione:**
+- `job_id`: Deve essere univoco, formato consigliato: `job_YYYYMMDD_HHMMSS`
+- `parts`: Formato "inizio:fine", entrambi numeri interi positivi
+- Paths: Devono essere relativi alla root del job
+
+#### Output Configuration
+```json
+{
+  "output_steps_dirs": {
+    "step1": "output/step1_generate_new_example",
+    "step2": "output/step2_export_alignments",
+    "step3": "output/step3_fix_groundtruth", 
+    "step4": "output/step4_fix_images",
+    "step5": "output/step5_boost",
+    "step6": "output/step6_reconstruct"
+  }
+}
+```
+
+**Note:**
+- Tutti i path sono relativi alla directory del job
+- Le directory vengono create automaticamente
+- Modificare solo se necessario per debugging
+
+### 2. Image Processing Options
+
+#### Background Processing
+```json
+{
+  "bg_color": "255 255 255",    // RGB del background
+  "bg_tolerance": 0,            // Tolleranza colore (0-255)
+  "mask_extension": ".jpg",     // Estensione file frammenti
+  "output_extension": ".jpg"    // Estensione output
+}
+```
+
+**Configurazioni Comuni:**
+```json
+// Background bianco standard
+{
+  "bg_color": "255 255 255",
+  "bg_tolerance": 0
+}
+
+// Background nero
+{
+  "bg_color": "0 0 0", 
+  "bg_tolerance": 5
+}
+
+// Background verde (chroma key)
+{
+  "bg_color": "0 255 0",
+  "bg_tolerance": 20
+}
+
+// Background automatico (tolleranza alta)
+{
+  "bg_color": "128 128 128",
+  "bg_tolerance": 50
+}
+```
+
+### 3. Load Options (Preprocessing)
+
+#### Configurazione Completa
+```json
+{
+  "load_options": {
+    "is_grad_dir_on_plt_output": false,     // Mostra direzione gradiente
+    "is_smooth_before_grad": false,         // Smooth pre-gradiente
+    "is_use_rand_frag_rot": false,          // Rotazione casuale frammenti
+    "is_use_dist_colors_4grad": true,       // Colori distinti gradiente
+    "reduce_poly_length_to": 0.2,           // Riduzione lunghezza poligoni
+    "palette_sz": 14,                       // Dimensione palette colori
+    "is_use_palette_pxls_vals": true        // Usa valori palette
+  }
+}
+```
+
+#### Profili Predefiniti
+
+**Alta Qualità (Slow & Precise):**
+```json
+{
+  "load_options": {
+    "is_smooth_before_grad": true,
+    "reduce_poly_length_to": 0.1,
+    "palette_sz": 20,
+    "is_use_dist_colors_4grad": true
+  }
+}
+```
+
+**Performance (Fast & Approximated):**
+```json
+{
+  "load_options": {
+    "is_smooth_before_grad": false,
+    "reduce_poly_length_to": 0.3,
+    "palette_sz": 8,
+    "is_use_rand_frag_rot": true
+  }
+}
+```
+
+### 4. Dissimilarity Options
+
+#### Configurazione Matching
+```json
+{
+  "dis_options": {
+    "sampling_res": 4,              // Risoluzione campionamento
+    "small_ov_percentage": 0.05,    // % overlap piccolo
+    "smoothing_deg_window": 7       // Finestra smoothing (gradi)
+  }
+}
+```
+
+**Tuning Guidelines:**
+- `sampling_res`: Più alto = più preciso ma più lento (1-16)
+- `small_ov_percentage`: Soglia overlap minimo (0.01-0.1)
+- `smoothing_deg_window`: Finestra smoothing angoli (1-30)
+
+### 5. Confidence Options (Matching)
+
+#### Parametri Confidence
+```json
+{
+  "confoptions": {
+    "iou_thresh": 0.7,      // Soglia IoU per matching
+    "top_i": 1,             // Top-i candidati
+    "gamma_H": 0.7,         // Gamma alto
+    "gamma_L": 0.3          // Gamma basso
+  }
+}
+```
+
+**Tuning per Diversi Scenari:**
+
+**Puzzle Semplici (pochi pezzi, bordi chiari):**
+```json
+{
+  "confoptions": {
+    "iou_thresh": 0.6,
+    "top_i": 1,
+    "gamma_H": 0.8,
+    "gamma_L": 0.2
+  }
+}
+```
+
+**Puzzle Complessi (molti pezzi, texture simili):**
+```json
+{
+  "confoptions": {
+    "iou_thresh": 0.8,
+    "top_i": 3,
+    "gamma_H": 0.6,
+    "gamma_L": 0.4
+  }
+}
+```
+
+### 6. CNN Hyperparameters
+
+#### Configurazione Rete Neurale
+```json
+{
+  "hyperparameters": {
+    "width": 160,                    // Larghezza input CNN
+    "height": 160,                   // Altezza input CNN  
+    "depth": 3,                      // Canali (RGB=3)
+    "batch_size": 64,                // Dimensione batch
+    "weight_decay": 1e-4,            // Decadimento pesi (L2)
+    "learning_rate": 1e-4,           // Learning rate
+    "total_training_step": 30000,    // Step training totali
+    "learner_num": 5                 // Numero learner ensemble
+  }
+}
+```
+
+#### Profili Hardware-Specific
+
+**GPU Potente (RTX 3080+):**
+```json
+{
+  "hyperparameters": {
+    "width": 224,
+    "height": 224,
+    "batch_size": 32,
+    "learner_num": 7,
+    "total_training_step": 50000
+  }
+}
+```
+
+**GPU Media (GTX 1660, RTX 2060):**
+```json
+{
+  "hyperparameters": {
+    "width": 160,
+    "height": 160, 
+    "batch_size": 16,
+    "learner_num": 5,
+    "total_training_step": 30000
+  }
+}
+```
+
+**CPU Only:**
+```json
+{
+  "hyperparameters": {
+    "width": 128,
+    "height": 128,
+    "batch_size": 8,
+    "learner_num": 3,
+    "total_training_step": 15000
+  }
+}
+```
+
+## Configurazioni Environment (.env)
+
+### File .env Base
+```env
+# ===========================================
+# FRAME PIPELINE CONFIGURATION
+# ===========================================
+
+# Job Management
+PIPELINE_JOBS_DIR=/mnt/c/Users/user/Documents/Reassembly2d_Sources/jobs
+PIPELINE_DEFAULT_CONFIG=/home/frame/frame_pipeline/config_template.json
+
+# Python Environment  
+PYTHONPATH=/home/frame/frame_pipeline
+PYTHON_ENV_PATH=/home/frame/frame_pipeline/venv
+
+# MATLAB Configuration
+MATLAB_PATH=/usr/local/MATLAB/R2020b/bin/matlab
+MATLAB_WATCH_PATH=C:\Users\user\Documents\Reassembly2d_Sources\jobs
+
+# TensorFlow Configuration
+TF_CPP_MIN_LOG_LEVEL=2
+CUDA_VISIBLE_DEVICES=0
+
+# Performance Tuning
+OMP_NUM_THREADS=4
+TF_ENABLE_ONEDNN_OPTS=0
+
+# Debugging
+PIPELINE_DEBUG=false
+PIPELINE_VERBOSE_LOGGING=false
+```
+
+### Environment Variables Reference
+
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `PIPELINE_JOBS_DIR` | Directory principale job | `./jobs` | `/path/to/jobs` |
+| `PIPELINE_DEFAULT_CONFIG` | Config predefinito | None | `/path/to/config.json` |
+| `MATLAB_PATH` | Path eseguibile MATLAB | `matlab` | `/usr/local/MATLAB/bin/matlab` |
+| `TF_CPP_MIN_LOG_LEVEL` | Livello log TensorFlow | `0` | `2` (warnings only) |
+| `CUDA_VISIBLE_DEVICES` | GPU disponibili | All | `0,1` |
+| `PIPELINE_DEBUG` | Modalità debug | `false` | `true` |
+
+## Configurazioni per Scenari Specifici
+
+### 1. Puzzle Piccoli (3x3, 2x2)
+
+```json
+{
+  "parts": "1:9",
+  "top_k": 5,
+  "hyperparameters": {
+    "batch_size": 16,
+    "learner_num": 3,
+    "total_training_step": 15000
+  },
+  "confoptions": {
+    "iou_thresh": 0.6,
+    "top_i": 1
+  }
+}
+```
+
+### 2. Puzzle Medi (4x4, 5x4)
+
+```json
+{
+  "parts": "1:20", 
+  "top_k": 10,
+  "hyperparameters": {
+    "batch_size": 32,
+    "learner_num": 5,
+    "total_training_step": 30000
+  },
+  "confoptions": {
+    "iou_thresh": 0.7,
+    "top_i": 2
+  }
+}
+```
+
+### 3. Puzzle Grandi (6x6+)
+
+```json
+{
+  "parts": "1:36",
+  "top_k": 20,
+  "hyperparameters": {
+    "width": 224,
+    "height": 224,
+    "batch_size": 16,
+    "learner_num": 7,
+    "total_training_step": 50000
+  },
+  "confoptions": {
+    "iou_thresh": 0.8,
+    "top_i": 3
+  }
+}
+```
+
+### 4. Immagini con Texture Complesse
+
+```json
+{
+  "load_options": {
+    "is_smooth_before_grad": true,
+    "reduce_poly_length_to": 0.1,
+    "palette_sz": 20
+  },
+  "dis_options": {
+    "sampling_res": 8,
+    "small_ov_percentage": 0.02
+  },
+  "confoptions": {
+    "iou_thresh": 0.8,
+    "top_i": 5
+  }
+}
+```
+
+### 5. Immagini Monocromatiche/Semplici
+
+```json
+{
+  "load_options": {
+    "is_use_dist_colors_4grad": true,
+    "palette_sz": 8,
+    "reduce_poly_length_to": 0.3
+  },
+  "dis_options": {
+    "sampling_res": 2,
+    "smoothing_deg_window": 15
+  }
+}
+```
+
+## Debugging e Profiling
+
+### Configurazione Debug
+
+```json
+{
+  "debug_options": {
+    "save_intermediate_results": true,
+    "verbose_logging": true,
+    "profile_performance": true,
+    "validate_each_step": true
+  }
+}
+```
+
+### Environment Debug
+```env
+# Debug completo
+PIPELINE_DEBUG=true
+PIPELINE_VERBOSE_LOGGING=true
+TF_CPP_MIN_LOG_LEVEL=0
+
+# Profiling TensorFlow
+TF_ENABLE_TRACE=true
+TF_TIMELINE_ENABLED=true
+```
+
+## Validazione Configurazione
+
+### Script di Validazione
+
+```python
+def validate_config(config_file):
+    """Valida configurazione prima dell'esecuzione"""
+    
+    # 1. Schema validation
+    validate_json_schema(config_file)
+    
+    # 2. Range validation
+    validate_parameter_ranges(config_file)
+    
+    # 3. Path validation  
+    validate_paths(config_file)
+    
+    # 4. Hardware compatibility
+    validate_hardware_compatibility(config_file)
+    
+    return True
+```
+
+### Comandi di Validazione
+
+```bash
+# Valida configurazione
+python3.7 -c "
+from lib.config_validator import validate_config
+validate_config('my_config.json')
+"
+
+# Test configurazione con job dummy
+./run_pipeline.py --test-config my_config.json
+
+# Dry-run completo
+./run_pipeline.py --dry-run ./masks/ ./orig.jpg "1:9" my_config.json
+```
+
+## Best Practices
+
+### 1. Versioning Configurazioni
+
+```bash
+# Versiona le configurazioni
+mkdir configs/
+cp config_template.json configs/v1.0-baseline.json
+cp my_custom.json configs/v1.1-optimized.json
+
+# Git tracking
+git add configs/
+git commit -m "Add configuration versions"
+```
+
+### 2. Environment Separation
+
+```env
+# Development
+PIPELINE_JOBS_DIR=/tmp/pipeline_dev_jobs
+PIPELINE_DEBUG=true
+
+# Production  
+PIPELINE_JOBS_DIR=/data/production_jobs
+PIPELINE_DEBUG=false
+TF_CPP_MIN_LOG_LEVEL=2
+```
+
+### 3. Performance Monitoring
+
+```json
+{
+  "monitoring": {
+    "log_memory_usage": true,
+    "log_processing_times": true, 
+    "save_performance_metrics": true
+  }
+}
+```
+
+---
+
+**Riferimenti:**
+- [Architecture Overview](01-architecture-overview.md)
+- [Filtri e Algoritmi](03-filters-algorithms.md)
+- [CNN Architecture](04-cnn-architecture.md)

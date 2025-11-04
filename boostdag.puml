@@ -1,0 +1,111 @@
+@startuml
+!theme plain
+scale 0.8
+
+skinparam rectangle {
+  BackgroundColor<<mainScript>> #ff9999
+  BorderColor<<mainScript>> #333333
+  BorderThickness<<mainScript>> 3
+  
+  BackgroundColor<<pyFile>> #99ccff
+  BorderColor<<pyFile>> #333333
+  BorderThickness<<pyFile>> 2
+  
+  BackgroundColor<<function>> #99ff99
+  BorderColor<<function>> #333333
+  BorderThickness<<function>> 1
+  
+  BackgroundColor<<external>> #ffcc99
+  BorderColor<<external>> #333333
+  BorderThickness<<external>> 1
+  
+  BackgroundColor<<data>> #ff99ff
+  BorderColor<<data>> #333333
+  BorderThickness<<data>> 1
+  
+  BackgroundColor<<class>> #ccffcc
+  BorderColor<<class>> #333333
+  BorderThickness<<class>> 2
+}
+
+' Layout principale organizzato per livelli
+package "Main Script" {
+  rectangle "Boost.py" as A <<mainScript>>
+  rectangle "main()" as B <<function>>
+}
+
+package "External Libraries" {
+  rectangle "numpy" as C <<external>>
+  rectangle "tensorflow" as D <<external>>
+  rectangle "cv2" as J <<external>>
+  rectangle "os,glob,sys" as K <<external>>
+  rectangle "argparse" as L <<external>>
+}
+
+package "Core Modules" {
+  rectangle "Parameters.py" as E <<pyFile>>
+  rectangle "JigsawNet.py" as F <<pyFile>>
+  rectangle "Utils.py" as G <<pyFile>>
+  rectangle "PairwiseAlign.py" as H <<pyFile>>
+  rectangle "TFRecordIO.py" as I <<pyFile>>
+}
+
+package "Functions" {
+  rectangle "SingleTest()" as M <<function>>
+  rectangle "ValidatePathNet()" as N <<function>>
+}
+
+package "Data Structures" {
+  rectangle "WorkSpacePath" as E1 <<data>>
+  rectangle "NNHyperparams" as E2 <<data>>
+  rectangle "JigsawNetWithROI" as F1 <<class>>
+  rectangle "GtPose" as G1 <<class>>
+  rectangle "Alignment2d" as G2 <<class>>
+}
+
+package "Key Methods" {
+  rectangle "_inference()" as F1A <<function>>
+  rectangle "FusionImage()" as H1 <<function>>
+  rectangle "ConvertStitch()" as G4 <<function>>
+}
+
+package "Input Files" {
+  rectangle "alpha.txt" as O1 <<data>>
+  rectangle "alignments.txt" as O2 <<data>>
+  rectangle "groundTruth.txt" as O3 <<data>>
+  rectangle "bg_color.txt" as O4 <<data>>
+  rectangle "fragment_*.png" as O5 <<data>>
+}
+
+' Relazioni semplificate
+A --> B
+B --> M
+B --> N
+
+A --> E
+A --> F
+A --> G
+A --> H
+
+E --> E1
+E --> E2
+F --> F1
+F --> F1A
+G --> G1
+G --> G2
+G --> G4
+H --> H1
+
+M --> F1
+N --> G1
+N --> G2
+N --> H1
+N --> F1A
+
+B --> O1
+B --> O2
+B --> O3
+B --> O4
+B --> O5
+
+@enduml

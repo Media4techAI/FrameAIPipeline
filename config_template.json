@@ -1,0 +1,52 @@
+{
+    "job_id": "PLACEHOLDER_JOB_ID",
+    "input_dir": "input",
+    "masks_dir": "input/masks",
+    "original_image": "input/original.jpg",
+    "output_steps_dirs": {
+        "step1": "output/step1_generate_new_example",
+        "step2": "output/step2_export_alignments",
+        "step3": "output/step3_fix_groundtruth",
+        "step4": "output/step4_fix_images",
+        "step5": "output/step5_boost",
+        "step6": "output/step6_reconstruct"
+    },
+    "bg_color": "8 248 8",
+    "bg_tolerance": 0,
+    "mask_extension": ".jpg",
+    "output_extension": ".jpg",
+    "parts": "PLACEHOLDER_PARTS",
+    "top_k": 10,
+    "load_options": {
+        "is_grad_dir_on_plt_output": false,
+        "is_smooth_before_grad": false,
+        "is_use_rand_frag_rot": false,
+        "is_use_dist_colors_4grad": true,
+        "reduce_poly_length_to": 0.2,
+        "palette_sz": 14,
+        "is_use_palette_pxls_vals": true
+    },
+    "dis_options": {
+        "sampling_res": 4,
+        "small_ov_percentage": 0.05,
+        "smoothing_deg_window": 7
+    },
+    "dis_version": 2,
+    "n_reduced_tforms": 40000,
+    "confoptions": {
+        "iou_thresh": 0.7,
+        "top_i": 1,
+        "gamma_H": 0.7,
+        "gamma_L": 0.3
+    },
+    "hyperparameters": {
+        "width": 160,       
+        "height": 160,  
+        "depth" : 3,    
+        "batch_size": 64,
+        "weight_decay": 1e-4,
+        "learning_rate": 1e-4,
+        "total_training_step": 30000,
+        "learner_num": 5
+    }
+}
