@@ -129,11 +129,11 @@ python3.7 test_boost.py all
 #### Sviluppo (Singola Macchina)
 ```
 ┌─────────────────────────────────────┐
-│        Development Machine         │
+│        Development Machine          │
 ├─────────────────────────────────────┤
-│  Python Pipeline + MATLAB          │
+│  Python Pipeline + MATLAB           │
 │  Local Storage                      │
-│  Manual Job Management             │
+│  Manual Job Management              │
 └─────────────────────────────────────┘
 ```
 
