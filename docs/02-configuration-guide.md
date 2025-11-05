@@ -1,10 +1,17 @@
 # Frame Pipeline - Configurazione Dettagliata
 
+> **Diagrammi di Riferimento**: 
+> - [High Level Architecture](img/high_level_architetture.png)
+> - [Component Diagram](img/component_diagram.png)
+> - [Configuration PlantUML](diagrams/high_level_architetture.puml)
+
 ## Introduzione
 
 Questo documento fornisce una guida completa alla configurazione del Frame Pipeline, dalla configurazione base agli scenari avanzati e personalizzazioni.
 
 ## Sistema di Configurazione
+
+> **Diagramma Configurazione**: Vedere l'architettura gerarchica nella [Panoramica Architetturale](01-architecture-overview.md#configuration-system)
 
 ### Gerarchia delle Configurazioni
 

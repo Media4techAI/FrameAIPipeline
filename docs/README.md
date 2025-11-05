@@ -1,5 +1,23 @@
 # Frame Pipeline - Documentazione Tecnica
 
+## Diagrammi e Visualizzazioni
+
+> **Collezione Diagrammi**: Il sistema include diagrammi completi per visualizzare l'architettura:
+> - **Cartella Sorgenti**: [`diagrams/`](diagrams/) - File PlantUML (.puml) editabili
+> - **Cartella Immagini**: [`img/`](img/) - Diagrammi renderizzati (.png)
+> - **Indice Completo**: [`DIAGRAMS_INDEX.md`](DIAGRAMS_INDEX.md) - Catalogo completo diagrammi
+> - **Documentazione Diagrammi**: [`diagrams/README.md`](diagrams/README.md)
+
+### Diagrammi Principali
+
+| Diagramma | Sorgente PlantUML | Immagine | Descrizione |
+|-----------|------------------|----------|-------------|
+| **Architettura Sistema** | [high_level_architetture.puml](diagrams/high_level_architetture.puml) | ![Architecture](img/high_level_architetture.png) | Panoramica completa del sistema |
+| **Flusso Dati** | [dataflow.puml](diagrams/dataflow.puml) | ![Dataflow](img/dataflow.png) | Pipeline step-by-step |
+| **Catena Filtri** | [chain_architetture.puml](diagrams/chain_architetture.puml) | ![Filters](img/chain_architetture.png) | Architettura filtri |
+| **Componenti** | [component_diagram.puml](diagrams/component_diagram.puml) | ![Components](img/component_diagram.png) | Diagramma componenti C4 |
+| **Sequenza** | [sequence_diagram.puml](diagrams/sequence_diagram.puml) | ![Sequence](img/sequence_diagram.png) | Interazione temporale |
+
 ## Indice della Documentazione
 
 Questa è la documentazione tecnica completa del Frame Pipeline
@@ -13,6 +31,7 @@ Questa è la documentazione tecnica completa del Frame Pipeline
 | **[03-filters-algorithms.md](03-filters-algorithms.md)** | Dettagli implementativi dei filtri | Algoritmi, preprocessing, CNN processing, ricostruzione |
 | **[04-cnn-architecture.md](04-cnn-architecture.md)** | Architettura delle reti neurali | JigsawNet, ensemble learning, training, ottimizzazioni |
 | **[05-deployment-guide.md](05-deployment-guide.md)** | Guide per deployment e produzione | Docker, cloud, monitoring, security, disaster recovery |
+| **[DIAGRAMS_INDEX.md](DIAGRAMS_INDEX.md)** | Indice completo diagrammi | Catalogo diagrammi PlantUML e immagini con riferimenti |
 
 ### Pubblico di Riferimento
 
@@ -53,6 +72,14 @@ Input → MATLAB → Fix GT → Fix BG → CNN → Reconstruct → Output
 3. **Fix Backgrounds**: Normalizzazione sfondi immagini
 4. **Boost Filter**: Elaborazione CNN ensemble (5 reti)
 5. **Reconstruct Filter**: Ricostruzione finale ottimizzata
+
+### Workflow Visuale
+
+**Pipeline Completo**: 
+![Complete Pipeline Flow](img/dataflow_architetture.png)
+
+**Trasformazioni Dati**: 
+![Data Transformations](img/data_transformation.png)
 
 ### Caratteristiche Principali
 
@@ -125,6 +152,8 @@ python3.7 test_boost.py all
 ```
 
 ### Architettura Sviluppo vs Produzione
+
+> **Riferimento Visuale**: Vedi [System Architecture](img/high_level_architetture.png) per dettagli completi
 
 #### Sviluppo (Singola Macchina)
 ```

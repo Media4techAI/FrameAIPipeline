@@ -1,0 +1,79 @@
+@startuml Pipeline Execution Sequence
+
+actor User
+participant "Pipeline\nController" as PC
+participant "Job\nManager" as JM
+participant "MATLAB\nFilter" as MF
+participant "Fix GT\nFilter" as FGT
+participant "Fix BG\nFilter" as FBG
+participant "Boost\nFilter" as BF
+participant "Reconstruct\nFilter" as RF
+participant "MATLAB\nRuntime" as MR
+participant "CNN\nModels" as CNN
+participant "Global\nReassembly" as GR
+
+User -> PC : run_pipeline.py masks/ orig.jpg "1:9"
+activate PC
+
+PC -> JM : create_job_structure()
+activate JM
+JM -> JM : create directories
+JM -> JM : copy input files
+JM -> JM : generate params.json
+JM --> PC : job_folder ready
+deactivate JM
+
+PC -> MF : process()
+activate MF
+MF -> MR : PowerShell execution
+activate MR
+MR -> MR : generate_new_example (Step 1)
+MR -> MR : export_alignments (Step 2)
+MR --> MF : groundtruth.txt + alignments.txt
+deactivate MR
+MF --> PC : step1-2 complete
+deactivate MF
+
+PC -> FGT : process()
+activate FGT
+FGT -> FGT : load groundtruth + alignments
+FGT -> FGT : correct alignment data
+FGT --> PC : groundtruth_fixed.txt
+deactivate FGT
+
+PC -> FBG : process()
+activate FBG
+FBG -> FBG : load fragment images
+FBG -> FBG : normalize backgrounds to "8 248 8"
+FBG -> FBG : resize to 160x160
+FBG --> PC : normalized fragments
+deactivate FBG
+
+PC -> BF : process()
+activate BF
+BF -> CNN : load 5 ensemble models (g0-g4)
+activate CNN
+BF -> CNN : inference on fragment pairs
+CNN --> BF : predictions + probabilities
+deactivate CNN
+BF -> BF : ensemble voting
+BF -> BF : filter alignments
+BF --> PC : filtered_alignments.txt + dataset_config.json
+deactivate BF
+
+PC -> RF : process()
+activate RF
+RF -> GR : bin/GlobalReassembly with dataset_config.json
+activate GR
+GR -> GR : reconstruct final image
+GR --> RF : final_result.jpg
+deactivate GR
+RF --> PC : reconstruction complete
+deactivate RF
+
+PC --> User : pipeline execution complete
+deactivate PC
+
+note over User, GR : Job can be resumed with -j option\nif interrupted at any point
+
+@enduml

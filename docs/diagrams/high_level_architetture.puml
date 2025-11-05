@@ -1,0 +1,82 @@
+@startuml
+allowmixing
+left to right direction
+title Frame Pipeline System - High Level Architecture
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+skinparam class {
+  BackgroundColor LightBlue
+  BorderColor Black
+}
+
+skinparam component {
+  BackgroundColor LightGreen
+  BorderColor DarkGreen
+}
+
+package "FRAME PIPELINE SYSTEM" as system {
+    
+    package "Input Layer" as input_layer {
+        class "Masks\nFragments" as masks
+        class "Original\nImage" as original
+        class "Config\nJSON" as config
+    }
+    
+    package "Processing Layer" as processing_layer {
+        component "Pipeline\nController" as controller
+        component "Job Manager" as jobmgr
+        component "Filter Chain" as filterchain
+        
+        package "FILTER PIPELINE" as filter_pipeline {
+            component "MATLAB\nFilter" as matlab
+            component "Fix\nGroundtruth" as fixgt
+            component "Fix\nBackground" as fixbg
+            component "Boost\nFilter\n(CNN)" as boost
+            component "Reconstruct\nFilter" as reconstruct
+        }
+    }
+    
+    package "Storage Layer" as storage_layer {
+        class "Model CNN\nCheckpoints\n(g0-g4)" as models
+        class "Job Folders\nStructure" as jobfolders
+        class "Logs\n& Results" as logs
+    }
+    
+    package "External Components" as external {
+        component "MATLAB\nRuntime" as matlabrt
+        component "TensorFlow\n1.15.x" as tensorflow
+        component "PowerShell\nAutomation" as powershell
+    }
+}
+
+' Input connections
+masks --> controller
+original --> controller
+config --> controller
+
+' Processing connections
+controller --> jobmgr
+controller --> filterchain
+filterchain --> matlab
+
+' Filter pipeline connections
+matlab --> fixgt
+fixgt --> fixbg
+fixbg --> boost
+matlab --> boost
+boost --> reconstruct
+
+' Storage connections
+filterchain --> jobfolders
+filterchain --> logs
+boost --> models
+
+' External component connections
+matlab --> matlabrt
+matlab --> powershell
+boost --> tensorflow
+boost --> models
+
+@enduml

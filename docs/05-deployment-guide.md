@@ -1,14 +1,26 @@
 # Frame Pipeline - Deployment Guide
 
+> **Diagrammi di Riferimento**: 
+> - [System Architecture](img/high_level_architetture.png)
+> - [Component Dependencies](img/component_diagram.png)
+> - [Data Flow](img/dataflow_architetture.png)
+> - [PlantUML Sources](diagrams/)
+
 ## Introduzione
 
 Questa guida fornisce istruzioni dettagliate per il deployment del Frame Pipeline.
 
+> **Riferimento Architettura**: Consulta la [panoramica architetturale](01-architecture-overview.md) per comprendere i componenti del sistema prima del deployment.
+
 ## Architetture di Deployment
+
+> **Diagramma Sistema**: ![High Level Architecture](img/high_level_architetture.png)
 
 ### 1. Deployment Locale (Development)
 
 #### Configurazione Singola Macchina
+
+![System Architecture](img/high_level_architetture.png)
 
 ```
 ┌─────────────────────────────────────────┐

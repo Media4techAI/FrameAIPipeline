@@ -1,0 +1,35 @@
+@startuml Extensibility Architecture
+
+!define INTERFACE interface
+!define CLASS class
+!define EXTENSION class
+
+skinparam interfaceBackgroundColor lightgreen
+skinparam classBackgroundColor lightblue
+skinparam classBackgroundColor<<extension>> lightyellow
+
+title System Extensibility
+
+INTERFACE BaseFilter {
+    +process(): bool
+}
+
+CLASS ExistingFilters {
+    MatlabFilter
+    FixGroundtruthFilter
+    FixImageBackgroundsFilter
+    BoostFilter
+    ReconstructFilter
+}
+
+EXTENSION MyCustomFilter <<extension>> {
+    +process(): bool
+    // Custom implementation
+}
+
+BaseFilter <|-- ExistingFilters
+BaseFilter <|-- MyCustomFilter
+
+note bottom of MyCustomFilter : Implementazione logica specifica\nreturn True  # Success
+
+@enduml

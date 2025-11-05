@@ -1,0 +1,70 @@
+@startuml
+skinparam rectangle {
+  BackgroundColor LightGreen
+  BorderColor Black
+}
+skinparam database {
+  BackgroundColor LightYellow
+  BorderColor Black
+}
+
+database "Input Data\n(via command line):\n• masks_folder\n• original_image\n• parts\n• config_file\n• --job-folder (-j)" as input_data
+
+rectangle "MATLAB Filter\n(Step 1-2)" as matlab_filter
+rectangle "Fix Groundtruth\n(Step 3)" as fix_gt
+rectangle "Fix Backgrounds\n(Step 4)" as fix_bg
+rectangle "Boost Filter\n(Step 5)\n(CNN/TF1.15)" as boost_filter
+rectangle "Reconstruct\n(Step 6)" as reconstruct_filter
+
+database "Final Result:\nstep6_reconstruct/\nfinal_result.jpg" as final_result
+
+input_data --> matlab_filter
+matlab_filter --> fix_gt
+fix_gt --> fix_bg
+fix_bg --> boost_filter
+boost_filter --> reconstruct_filter
+reconstruct_filter --> final_result
+
+note right of matlab_filter
+  INPUT: input/masks/*.jpg, input/original.jpg
+  OUTPUT: 
+    step1_generate_new_example/m/groundtruth.txt
+    step2_export_alignments/alignments.txt
+end note
+
+note right of fix_gt
+  INPUT:
+    step1_generate_new_example/m/groundtruth.txt
+    step2_export_alignments/alignments.txt
+  OUTPUT:
+    step3_fix_groundtruth/groundtruth_fixed.txt
+end note
+
+note right of fix_bg
+  INPUT: Fragment images from MATLAB processing
+  OUTPUT:
+    step4_fix_images/*.jpg (normalized fragments)
+    Background color: "8 248 8" (green)
+end note
+
+note right of boost_filter
+  INPUT:
+    step4_fix_images/*.jpg
+    step3_fix_groundtruth/groundtruth_fixed.txt
+    step2_export_alignments/alignments.txt
+  OUTPUT:
+    step5_boost/filtered_alignments.txt
+    step5_boost/dataset_config.json
+    CNN predictions (5 ensemble learners g0-g4)
+end note
+
+note right of reconstruct_filter
+  INPUT:
+    step5_boost/filtered_alignments.txt
+    step5_boost/dataset_config.json
+    Fragment images from step4
+  OUTPUT:
+    step6_reconstruct/final_result.jpg
+end note
+
+@enduml

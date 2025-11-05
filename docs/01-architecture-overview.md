@@ -4,6 +4,10 @@
 
 ### Panoramica del Sistema
 
+> **Diagrammi**: 
+> - PlantUML: [high_level_architetture.puml](diagrams/high_level_architetture.puml)
+> - Immagine: ![High Level Architecture](img/high_level_architetture.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FRAME PIPELINE SYSTEM                        │
@@ -91,7 +95,11 @@
 
 ### 1. Pipeline Controller (`lib/pipeline/pipeline.py`)
 
-Il controller principale che orchesttra l'intero processo:
+> **Diagrammi**: 
+> - PlantUML: [component_diagram.puml](diagrams/component_diagram.puml)
+> - Immagine: ![Component Diagram](img/component_diagram.png)
+
+Il controller principale che orchestra l'intero processo:
 
 ```python
 class Pipeline:
@@ -148,6 +156,10 @@ job_YYYYMMDD_HHMMSS/
 ```
 
 ### 3. Filter Chain Architecture
+
+> **Diagrammi**: 
+> - PlantUML: [chain_architetture.puml](diagrams/chain_architetture.puml)
+> - Immagine: ![Filter Chain Architecture](img/chain_architetture.png)
 
 #### Base Filter Interface
 ```python
@@ -218,6 +230,12 @@ Runtime Overrides (.env variables)
 
 ## Flusso di Dati
 
+> **Diagrammi**: 
+> - PlantUML: [dataflow_architetture.puml](diagrams/dataflow_architetture.puml) - Flusso completo dei dati
+> - PlantUML: [dataflow.puml](diagrams/dataflow.puml) - Pipeline core flow 
+> - PlantUML: [data_transformation.puml](diagrams/data_transformation.puml) - Trasformazioni dei frammenti
+> - Immagini: ![Dataflow Architecture](img/dataflow_architetture.png) | ![Core Pipeline Flow](img/dataflow.png) | ![Data Transformations](img/data_transformation.png)
+
 ### 1. Input Processing
 
 ```
@@ -280,6 +298,14 @@ python3.7 run_pipeline.py -j /path/to/existing/job_folder
     ↓
 Final Result: step6_reconstruct/final_result.jpg
 ```
+
+### Pipeline Execution Sequence
+
+> **Diagrammi**: 
+> - PlantUML: [sequence_diagram.puml](diagrams/sequence_diagram.puml)
+> - Immagine: ![Sequence Diagram](img/sequence_diagram.png)
+
+Il diagramma di sequenza mostra l'interazione temporale tra i componenti durante l'esecuzione della pipeline, dall'invocazione dell'utente fino alla generazione del risultato finale.
 
 ### 3. Data Transformations
 
@@ -399,6 +425,10 @@ def resume_job(job_folder):
 - **Error reporting**: Reportistica errori dettagliata
 
 ## Estensibilità
+
+> **Diagrammi**: 
+> - PlantUML: [new_filters.puml](diagrams/new_filters.puml)
+> - Immagine: ![Extensibility Architecture](img/new_filters.png)
 
 ### 1. Nuovi Filtri
 

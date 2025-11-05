@@ -1,10 +1,18 @@
 # Frame Pipeline - Filtri e Algoritmi
 
+> **Diagrammi di Riferimento**: 
+> - [Filter Chain Architecture](img/chain_architetture.png)
+> - [Data Transformation Flow](img/data_transformation.png)
+> - [Sequence Diagram](img/sequence_diagram.png)
+> - [PlantUML Sources](diagrams/)
+
 ## Introduzione
 
 Questo documento fornisce una descrizione dettagliata di ogni filtro nella pipeline, inclusi gli algoritmi utilizzati, i parametri di configurazione e le ottimizzazioni implementate.
 
 ## Architettura dei Filtri
+
+> **Diagramma Architettura**: ![Filter Chain](img/chain_architetture.png)
 
 ### Base Filter Framework
 
@@ -38,9 +46,15 @@ class BaseFilter:
 
 ## Filtro 1: MATLAB Filter
 
+> **Diagrammi Specifici**: 
+> - [Pipeline Flow](img/dataflow.png) - Mostra MATLAB Filter come Step 1-2
+> - [Sequence Diagram](img/sequence_diagram.png) - Interazione MATLAB Runtime
+
 ### Scopo e Funzionalità
 
 Il MATLAB Filter è responsabile del preprocessing iniziale dei frammenti del puzzle e della generazione dei dati di training per la CNN.
+
+![MATLAB Processing Flow](img/dataflow.png)
 
 ### Algoritmi Implementati
 

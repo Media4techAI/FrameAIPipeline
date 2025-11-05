@@ -1,0 +1,79 @@
+@startuml Component Diagram
+
+!include <C4/C4_Component>
+
+title Frame Pipeline System - Component Diagram
+
+
+Component(run_pipeline, "run_pipeline.py", "Python Script", "Main entry point and CLI interface")
+Component(pipeline_ctrl, "Pipeline Controller", "Python Class", "Orchestrates filter execution")
+Component(job_mgr, "Job Manager", "Python Module", "Manages job lifecycle and storage")
+Component(parameters, "Parameters", "Static Class", "Configuration management")
+
+Container_Boundary(filters, "Filter Chain") {
+    Component(matlab_filter, "MATLAB Filter", "Python Filter", "Steps 1-2: Preprocessing")
+    Component(fix_gt_filter, "Fix Groundtruth Filter", "Python Filter", "Step 3: Data correction")
+    Component(fix_bg_filter, "Fix Background Filter", "Python Filter", "Step 4: Normalization")
+    Component(boost_filter, "Boost Filter", "Python Filter", "Step 5: CNN inference")
+    Component(reconstruct_filter, "Reconstruct Filter", "Python Filter", "Step 6: Assembly")
+}
+
+Container_Boundary(cnn, "CNN System") {
+    Component(jigsawnet, "JigsawNetWithROI", "TensorFlow Model", "CNN architecture")
+    Component(single_test, "SingleTest", "Python Module", "Model inference")
+    Component(validate_path, "ValidatePathNet", "Python Module", "Ensemble validation")
+}
+
+Container_Boundary(utils, "Utilities") {
+    Component(image_utils, "Image Utils", "Python Modules", "Image processing utilities")
+    Component(converters, "Converters", "Python Modules", "Data format converters")
+    Component(cnn_utils, "CNN Utils", "Python Modules", "CNN helper functions")
+}
+
+
+
+Component(matlab_rt, "MATLAB Runtime", "External", "MATLAB execution environment")
+Component(powershell, "PowerShell", "External", "Automation scripting")
+Component(tensorflow, "TensorFlow 1.15", "External", "ML framework")
+Component(global_reassembly, "GlobalReassembly", "C++ Binary", "Final reconstruction")
+
+
+
+ComponentDb(job_folders, "Job Folders", "File System", "Job data and results")
+ComponentDb(cnn_models, "CNN Models", "File System", "Pre-trained model checkpoints (g0-g4)")
+ComponentDb(config_files, "Configuration", "JSON Files", "System configuration")
+
+
+' Main flow
+Rel(run_pipeline, pipeline_ctrl, "creates and controls")
+Rel(pipeline_ctrl, job_mgr, "manages")
+Rel(pipeline_ctrl, parameters, "loads config from")
+Rel(pipeline_ctrl, matlab_filter, "executes")
+Rel(matlab_filter, fix_gt_filter, "feeds into")
+Rel(fix_gt_filter, fix_bg_filter, "feeds into")
+Rel(fix_bg_filter, boost_filter, "feeds into")
+Rel(boost_filter, reconstruct_filter, "feeds into")
+
+' CNN system
+Rel(boost_filter, jigsawnet, "uses")
+Rel(boost_filter, single_test, "uses")
+Rel(boost_filter, validate_path, "uses")
+Rel(jigsawnet, tensorflow, "runs on")
+Rel(single_test, cnn_models, "loads from")
+
+' External integrations
+Rel(matlab_filter, powershell, "calls")
+Rel(powershell, matlab_rt, "controls")
+Rel(reconstruct_filter, global_reassembly, "executes")
+
+' Utilities
+Rel(fix_bg_filter, image_utils, "uses")
+Rel(fix_gt_filter, converters, "uses")
+Rel(boost_filter, cnn_utils, "uses")
+
+' Storage
+Rel(job_mgr, job_folders, "reads/writes")
+Rel(parameters, config_files, "loads from")
+Rel(jigsawnet, cnn_models, "loads weights from")
+
+@enduml

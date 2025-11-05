@@ -1,14 +1,24 @@
 # Frame Pipeline - CNN Architecture
 
+> **Diagrammi di Riferimento**: 
+> - [System Components](img/component_diagram.png)
+> - [Boost Filter Detail](img/boostdag.png)
+> - [Data Flow](img/dataflow_architetture.png)
+> - [PlantUML Sources](diagrams/component_diagram.puml)
+
 ## Introduzione
 
 Questo documento fornisce una descrizione dettagliata dell'architettura delle reti neurali convoluzionali utilizzate nel Frame Pipeline, incluse le specifiche tecniche, le ottimizzazioni implementate e le strategie di training.
 
 ## Architettura JigsawNet
 
+> **Diagramma Boost**: ![Boost Filter Architecture](img/boostdag.png)
+
 ### Overview dell'Architettura
 
 Il sistema utilizza un'architettura CNN specializzata chiamata **JigsawNetWithROI** progettata specificamente per il problema dell'allineamento di frammenti di puzzle. L'architettura è ottimizzata per elaborare coppie di frammenti e predire le loro relazioni spaziali.
+
+![Boost Filter Architecture](img/boostdag.png)
 
 ```
 Input Pair (160x160x3 each)

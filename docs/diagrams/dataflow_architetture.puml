@@ -1,0 +1,86 @@
+@startuml
+top to bottom direction
+
+skinparam rectangleBackgroundColor lightblue
+skinparam databaseBackgroundColor lightyellow
+skinparam actorBackgroundColor lightgreen
+
+title Frame Pipeline - Data Flow
+
+' === External Entities ===
+actor "User" as user
+actor "MATLAB\nRuntime" as matlabrt
+actor "TensorFlow\nCNN Models\n(g0-g4)" as cnnmodels
+actor "PowerShell\nAutomation" as ps
+
+' === Processes ===
+rectangle "Input\nValidation" as validate
+rectangle "Job\nCreation" as jobcreate
+rectangle "MATLAB\nFilter\n(Steps 1-2)" as matlab
+rectangle "Fix Groundtruth\n(Step 3)" as fixgt
+rectangle "Fix Backgrounds\n(Step 4)" as fixbg
+rectangle "Boost Filter\n(Step 5)" as boost
+rectangle "Reconstruct\n(Step 6)" as reconstruct
+
+' === Data Stores (use database for cylinders) ===
+database "input/masks/*.jpg" as inputmasks
+database "input/original.jpg" as inputoriginal
+database "input/params.json" as params
+database "step1_generate_new_example/\nm/groundtruth.txt" as gt1
+database "step2_export_alignments/\nalignments.txt" as align2
+database "step3_fix_groundtruth/\ngroundtruth_fixed.txt" as gt3
+database "step4_fix_images/\n*.jpg (160x160)" as norm4
+database "step5_boost/\nfiltered_alignments.txt" as filter5
+database "step5_boost/\ndataset_config.json" as config5
+database "step6_reconstruct/\nfinal_result.jpg" as result6
+
+' === Flows ===
+user --> validate : masks_folder\noriginal_image\nparts "1:9"\nconfig_file
+validate --> jobcreate : validated inputs
+jobcreate --> inputmasks : copy fragments
+jobcreate --> inputoriginal : copy reference
+jobcreate --> params : generate config
+
+inputmasks --> matlab
+inputoriginal --> matlab
+params --> matlab
+matlab --> matlabrt : PowerShell call
+matlabrt --> gt1 : generate
+matlabrt --> align2 : export
+
+gt1 --> fixgt
+align2 --> fixgt
+fixgt --> gt3
+
+matlab --> fixbg : fragment data
+fixbg --> norm4 : normalized\nbg: "8 248 8"
+
+norm4 --> boost
+gt3 --> boost
+align2 --> boost
+boost --> cnnmodels : ensemble inference
+cnnmodels --> filter5 : predictions
+cnnmodels --> config5 : parameters
+
+filter5 --> reconstruct
+config5 --> reconstruct
+norm4 --> reconstruct
+reconstruct --> result6 : final assembly
+
+' === Notes ===
+note right of matlab
+  Uses PowerShell to
+  control MATLAB execution
+end note
+
+note right of boost
+  5 CNN learners
+  ensemble voting
+end note
+
+note right of reconstruct
+  Uses bin/GlobalReassembly
+  binary for final assembly
+end note
+
+@enduml

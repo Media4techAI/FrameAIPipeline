@@ -1,0 +1,62 @@
+@startuml Filter Chain Architecture
+
+!define INTERFACE interface
+!define CLASS class
+!define ABSTRACT abstract
+
+skinparam interfaceBackgroundColor lightgreen
+skinparam classBackgroundColor lightblue
+skinparam abstractBackgroundColor lightyellow
+
+INTERFACE BaseFilter {
+    +__init__(shared_dir, mask_folder, original_image, config_file, parts, job_folder, job_id)
+    +load_parameters()
+    +process(): bool
+    +get_output_dir(): string
+}
+
+package "Pre-processing Filters" {
+    CLASS MatlabFilter {
+        +process(): bool
+    }
+    
+    CLASS FixGroundtruthFilter {
+        +process(): bool
+    }
+    
+    CLASS FixImageBackgroundsFilter {
+        +process(): bool
+    }
+}
+
+package "Core Processing Filters" {
+    CLASS BoostFilter {
+        +process(): bool
+    }
+}
+
+package "Post-processing Filters" {
+    CLASS ReconstructFilter {
+        +process(): bool
+    }
+}
+
+BaseFilter <|-- MatlabFilter
+BaseFilter <|-- FixGroundtruthFilter
+BaseFilter <|-- FixImageBackgroundsFilter
+BaseFilter <|-- BoostFilter
+BaseFilter <|-- ReconstructFilter
+
+MatlabFilter --> FixGroundtruthFilter : feeds into
+FixGroundtruthFilter --> FixImageBackgroundsFilter : feeds into
+FixImageBackgroundsFilter --> BoostFilter : feeds into
+BoostFilter --> ReconstructFilter : feeds into
+
+note bottom of BaseFilter : Interfaccia comune per consistenza
+note bottom of MatlabFilter : Steps 1-2: MATLAB preprocessing
+note bottom of FixGroundtruthFilter : Step 3: Data correction
+note bottom of FixImageBackgroundsFilter : Step 4: Background normalization
+note bottom of BoostFilter : Step 5: CNN ensemble inference
+note bottom of ReconstructFilter : Step 6: Final assembly
+
+@enduml

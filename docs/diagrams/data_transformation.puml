@@ -1,0 +1,38 @@
+@startuml Fragment Data Transformations
+
+!define STAGE rectangle
+!define PROCESS note
+
+skinparam rectangleBackgroundColor lightcyan
+skinparam rectangleBorderColor blue
+skinparam noteBackgroundColor lightyellow
+
+STAGE "Raw Fragment Image\n(PNG/JPG)" as raw_fragment
+
+STAGE "Training Example\nstep1_generate_new_example/m/groundtruth.txt" as training_example
+STAGE "Export Alignments\nstep2_export_alignments/alignments.txt" as export_alignments
+
+STAGE "Fixed Groundtruth\nstep3_fix_groundtruth/groundtruth_fixed.txt" as fixed_gt
+
+STAGE "Standardized Fragment\nstep4_fix_images/*.jpg\n(160x160, bg: \"8 248 8\")" as standardized
+
+STAGE "Predictions from 5 learners (g0-g4)\nstep5_boost/filtered_alignments.txt" as predictions
+STAGE "Feature Vectors + Confidence Scores\nstep5_boost/dataset_config.json" as features
+
+STAGE "Final Assembled Image\nstep6_reconstruct/final_result.jpg" as final_image
+
+raw_fragment --> training_example : [MATLAB preprocessing - step1]
+raw_fragment --> export_alignments : [MATLAB preprocessing - step2]
+
+training_example --> fixed_gt : [Groundtruth correction - step3]
+export_alignments --> fixed_gt
+
+fixed_gt --> standardized : [Background normalization - step4]
+
+standardized --> predictions : [CNN ensemble processing - step5]
+standardized --> features
+
+predictions --> final_image : [Reconstruction algorithm - step6]
+features --> final_image
+
+@enduml
