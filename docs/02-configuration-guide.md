@@ -309,26 +309,6 @@ Il sistema utilizza una struttura gerarchica a cascata per le configurazioni:
 # Job Management
 PIPELINE_JOBS_DIR=/mnt/c/Users/user/Documents/Reassembly2d_Sources/jobs
 PIPELINE_DEFAULT_CONFIG=/home/frame/frame_pipeline/config_template.json
-
-# Python Environment  
-PYTHONPATH=/home/frame/frame_pipeline
-PYTHON_ENV_PATH=/home/frame/frame_pipeline/venv
-
-# MATLAB Configuration
-MATLAB_PATH=/usr/local/MATLAB/R2020b/bin/matlab
-MATLAB_WATCH_PATH=C:\Users\user\Documents\Reassembly2d_Sources\jobs
-
-# TensorFlow Configuration
-TF_CPP_MIN_LOG_LEVEL=2
-CUDA_VISIBLE_DEVICES=0
-
-# Performance Tuning
-OMP_NUM_THREADS=4
-TF_ENABLE_ONEDNN_OPTS=0
-
-# Debugging
-PIPELINE_DEBUG=false
-PIPELINE_VERBOSE_LOGGING=false
 ```
 
 ### Environment Variables Reference
@@ -337,10 +317,6 @@ PIPELINE_VERBOSE_LOGGING=false
 |----------|-------------|---------|---------|
 | `PIPELINE_JOBS_DIR` | Directory principale job | `./jobs` | `/path/to/jobs` |
 | `PIPELINE_DEFAULT_CONFIG` | Config predefinito | None | `/path/to/config.json` |
-| `MATLAB_PATH` | Path eseguibile MATLAB | `matlab` | `/usr/local/MATLAB/bin/matlab` |
-| `TF_CPP_MIN_LOG_LEVEL` | Livello log TensorFlow | `0` | `2` (warnings only) |
-| `CUDA_VISIBLE_DEVICES` | GPU disponibili | All | `0,1` |
-| `PIPELINE_DEBUG` | Modalità debug | `false` | `true` |
 
 ## Configurazioni per Scenari Specifici
 
