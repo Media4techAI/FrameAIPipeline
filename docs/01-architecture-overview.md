@@ -460,5 +460,4 @@ class MyCustomFilter(BaseFilter):
 **Riferimenti:**
 - [Configurazione Dettagliata](02-configuration-guide.md)
 - [Filtri e Algoritmi](03-filters-algorithms.md)
-- [CNN Architecture](04-cnn-architecture.md)
 - [Deployment Guide](05-deployment-guide.md)

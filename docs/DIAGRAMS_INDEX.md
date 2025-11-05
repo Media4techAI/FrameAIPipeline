@@ -179,29 +179,9 @@ plantuml high_level_architetture.puml -o ../img/
 markdown-link-check docs/*.md
 ```
 
-### Checklist Manutenzione
-- [ ] Sincronizzazione sorgenti PlantUML e immagini
-- [ ] Verifica riferimenti nei documenti
-- [ ] Test rendering in diversi viewer
-- [ ] Aggiornamento indici se aggiunti nuovi diagrammi
-- [ ] Validazione accessibility (alt text, contrasto)
-
 ## Tool e Risorse
 
 ### Rendering Tools
 - **VS Code**: PlantUML Extension
 - **Online**: [PlantUML Server](http://www.plantuml.com/plantuml/)
 - **CLI**: `plantuml` package
-- **IntelliJ**: PlantUML Plugin
-
-### Validazione
-- **Markdown**: `markdownlint` 
-- **Links**: `markdown-link-check`
-- **Images**: Verifica manuale rendering
-
-### Best Practices
-- Mantieni diagrammi semplici e leggibili
-- Usa note per dettagli aggiuntivi
-- Allinea stili tra diagrammi correlati
-- Documenta purpose di ogni diagramma
-- Versionare insieme a codice
